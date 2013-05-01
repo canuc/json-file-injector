@@ -36,7 +36,13 @@ public class InputFileReplacer {
 		paramEndSequence = paramEnd;
 	}
 	
-
+	/**
+	 * This will do our replacement. It will pass any found variables down to the specfied processor
+	 * 
+	 * @param processor 
+	 * @throws NameNotFoundException if a var is found that could not be matched this will be thrown
+	 * @throws IOException IOException will be thrown if we cannot read or write from the file
+	 */
 	public void runReplace( ParamProcessor processor) throws NameNotFoundException, IOException {
 		ParseType type = ParseType.ParseTypeBody;
 		String partial = "";
@@ -73,7 +79,6 @@ public class InputFileReplacer {
 				} else if ( type == ParseType.ParseVarBody ) {
 					partial += new String(new int[]{currByte},0,1);
 					_log.debug("Var found: "+partial);
-					
 					if ( partial.endsWith(paramEndSequence)) {
 						String varName = partial.substring(0,partial.length()-paramEndSequence.length());
 						processor.outputVarContentsToStream(os, varName);

@@ -102,18 +102,32 @@ public class InjectController implements ParamProcessor {
 
 	public void outputVarContentsToStream(OutputStream os, String varName)
 			throws NameNotFoundException, IOException {
-		if (!mapConfig.containsKey(varName)
-				&& !systemProperties.containsKey(varName)) {
-			throw new NameNotFoundException("Could not find name: " + varName);
+		boolean isBase64 = false;
+		final String cleanParamName;
+		if ( varName.contains("|") ) {
+			int index = varName.lastIndexOf("|");
+			String options = varName.substring(index,varName.length());
+			cleanParamName = varName.substring(0, index);
+			
+			if ( options.contains("b") ) {
+				isBase64 = true;
+			} 
+		} else {
+			cleanParamName = varName;
+		}
+		
+		if (!mapConfig.containsKey(cleanParamName)
+				&& !systemProperties.containsKey(cleanParamName)) {
+			throw new NameNotFoundException("Could not find name: " + cleanParamName);
 		}
 
-		if (mapConfig.containsKey(varName)) {
-			File fileForVar = mapConfig.get(varName);
+		if (mapConfig.containsKey(cleanParamName)) {
+			File fileForVar = mapConfig.get(cleanParamName);
 			InputStream is = null;
 			try {
 				is = new FileInputStream(fileForVar);
 				InputStream wrappedInputStream = null;
-				if ( _base64 ) {
+				if ( _base64 | isBase64) {
 					wrappedInputStream = new Base64InputStream(is,true);
 				} else {
 					wrappedInputStream = new BufferedInputStream(is);
