@@ -14,8 +14,10 @@ import java.util.Set;
 
 import javax.naming.NameNotFoundException;
 
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.Base64;
 import org.json.simple.JSONObject;
 
 import com.kik.inject.iface.ParamProcessor;
@@ -23,17 +25,17 @@ import com.kik.inject.iface.ParamProcessor;
 public class InjectController implements ParamProcessor {
 	public final Map<String, File> mapConfig;
 	public final Map<String, String> systemProperties;
-
+	private final boolean _base64;
 	private final Log _log;
 	private static final int CHARACTER_NOT_FOUND = -1;
 	private static final int MAX_BUFFER_SIZE = 1024;
 
-	public InjectController(File rootFileHandle, MavenProject project,
+	public InjectController(File rootFileHandle, MavenProject project, boolean base64,
 			boolean recursive, Log log) {
 		_log = log;
 		_log.debug("File: " + rootFileHandle.getAbsolutePath());
 		_log.debug("File is dir " + rootFileHandle.isDirectory());
-
+		_base64 = base64;
 		systemProperties = addPropertiesFromProperties(project.getProperties());
 		if (rootFileHandle.isDirectory()) {
 			mapConfig = getFileList(rootFileHandle, recursive);
@@ -110,14 +112,18 @@ public class InjectController implements ParamProcessor {
 			InputStream is = null;
 			try {
 				is = new FileInputStream(fileForVar);
-
-				BufferedInputStream bis = new BufferedInputStream(is);
+				InputStream wrappedInputStream = null;
+				if ( _base64 ) {
+					wrappedInputStream = new Base64InputStream(is,true);
+				} else {
+					wrappedInputStream = new BufferedInputStream(is);
+				}
 
 				byte[] ret = new byte[MAX_BUFFER_SIZE];
 				boolean done = false;
 
 				while (!done) {
-					int read = bis.read(ret);
+					int read = wrappedInputStream.read(ret);
 					if (read == -1) {
 						done = true;
 						break;
@@ -127,7 +133,7 @@ public class InjectController implements ParamProcessor {
 					writeJSONEscapedStringToStream(os, tmpString);
 				}
 
-				bis.close();
+				wrappedInputStream.close();
 
 			} catch (IOException ioe) {
 				_log.error(ioe);

@@ -80,6 +80,14 @@ public class InjectJSONVars extends AbstractMojo {
 	 */
 	@Parameter(defaultValue = "${project.build.directory}/inject")
 	private String outputDirectory;
+	
+	/**
+	 * Do you want base64 encoded insertions
+	 * 
+	 * @parameter default-value="${project.build.directory}/inject
+	 */
+	@Parameter(defaultValue = "false")
+	private boolean base64;
 
 	/**
 	 * The project parameter. This will be by default the current project that
@@ -123,7 +131,7 @@ public class InjectJSONVars extends AbstractMojo {
 			if (fileInput.exists()) {
 				if (directoryOutput.canWrite()) {
 					InjectController controller = new InjectController(
-							dirParamValues, mavenProject, true, getLog());
+							dirParamValues, mavenProject,base64, true, getLog());
 					InputFileReplacer replacer = new InputFileReplacer(
 							fileInput, fileOut, paramStartTag, paramEndTag,
 							getLog());
