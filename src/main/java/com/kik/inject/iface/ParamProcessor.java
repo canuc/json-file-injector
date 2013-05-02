@@ -2,6 +2,7 @@ package com.kik.inject.iface;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 
 import javax.naming.NameNotFoundException;
 
@@ -11,6 +12,8 @@ import javax.naming.NameNotFoundException;
  * @author julian
  */
 public interface ParamProcessor {
-	void outputVarContentsToStream(OutputStream os, String varName)
+	boolean outputVarContentsToStream(OutputStream os, String varName)
 			throws NameNotFoundException, IOException;
+	
+	Set<String> getKeySet();
 }

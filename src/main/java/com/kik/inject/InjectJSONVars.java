@@ -130,11 +130,13 @@ public class InjectJSONVars extends AbstractMojo {
 
 			if (fileInput.exists()) {
 				if (directoryOutput.canWrite()) {
-					InjectController controller = new InjectController(
-							dirParamValues, mavenProject,base64, true, getLog());
 					InputFileReplacer replacer = new InputFileReplacer(
 							fileInput, fileOut, paramStartTag, paramEndTag,
 							getLog());
+					
+					InjectController controller = new InjectController(
+							dirParamValues, mavenProject,directoryOutput, getLog());
+					
 
 					for (String key : controller.getKeySet()) {
 						getLog().debug("GOT KEY: " + key);

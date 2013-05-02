@@ -81,7 +81,9 @@ public class InputFileReplacer {
 					
 					if ( partial.endsWith(paramEndSequence)) {
 						String varName = partial.substring(0,partial.length()-paramEndSequence.length());
-						processor.outputVarContentsToStream(os, varName);
+						if (!processor.outputVarContentsToStream(os, varName)) {
+							throw new NameNotFoundException("Name not found for: "+varName);
+						}
 						type = ParseType.ParseTypeBody;
 						partial = "";
 					}
