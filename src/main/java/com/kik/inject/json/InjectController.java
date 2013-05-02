@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -37,6 +38,7 @@ public class InjectController implements ParamProcessor {
 		_log.debug("File is dir " + rootFileHandle.isDirectory());
 		_base64 = base64;
 		systemProperties = addPropertiesFromProperties(project.getProperties());
+		
 		if (rootFileHandle.isDirectory()) {
 			mapConfig = getFileList(rootFileHandle, recursive);
 		} else {
@@ -51,12 +53,11 @@ public class InjectController implements ParamProcessor {
 		Set<Object> propertyKeys = properties.keySet();
 
 		for (Object propertyKey : propertyKeys) {
-			if (propertyKey instanceof String) {
-				String propertyKeyString = (String) propertyKey;
+				String propertyKeyString = (String) propertyKey.toString();
 				systemParams.put(propertyKeyString,
 						properties.getProperty(propertyKeyString, "")
 								.toString());
-			}
+			
 		}
 		return systemParams;
 	}
@@ -174,7 +175,10 @@ public class InjectController implements ParamProcessor {
 	}
 
 	public Set<String> getKeySet() {
-		return mapConfig.keySet();
+		Set<String> aggregatedSet = new HashSet<String>();
+		aggregatedSet.addAll(mapConfig.keySet());
+		aggregatedSet.addAll(systemProperties.keySet());
+		return aggregatedSet;
 	}
 
 }

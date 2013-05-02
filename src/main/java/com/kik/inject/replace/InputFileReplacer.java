@@ -55,7 +55,7 @@ public class InputFileReplacer {
 			os =  new FileOutputStream(fileOut,false);
 			int currByte= is.read();
 			while (currByte != -1) {
-				_log.debug("PARSE TYPE: " + type.ordinal());
+
 				if ( type == ParseType.ParseTypeBody ){
 					if ( currByte == paramStartSequence.charAt(0)) {
 						partial += paramStartSequence.charAt(0);
@@ -78,7 +78,7 @@ public class InputFileReplacer {
 					}
 				} else if ( type == ParseType.ParseVarBody ) {
 					partial += new String(new int[]{currByte},0,1);
-					_log.debug("Var found: "+partial);
+					
 					if ( partial.endsWith(paramEndSequence)) {
 						String varName = partial.substring(0,partial.length()-paramEndSequence.length());
 						processor.outputVarContentsToStream(os, varName);
