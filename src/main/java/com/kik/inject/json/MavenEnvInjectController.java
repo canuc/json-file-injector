@@ -13,7 +13,6 @@ import javax.naming.NameNotFoundException;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.Base64;
 import org.json.simple.JSONObject;
 
 import com.kik.inject.iface.ParamProcessor;
@@ -76,19 +75,10 @@ public class MavenEnvInjectController implements ParamProcessor {
 		}
 		
 		if ( systemProperties.containsKey(cleanParamName)) {
-			
-			String value = systemProperties.get(varName);
-			final byte[] writtenValue;
-			if ( isBase64 ) {
-				writtenValue = Base64.encodeBase64(value.getBytes(Charset.forName("UTF-8")));
-			} else {
-				writtenValue = value.getBytes(Charset.forName("UTF-8"));
-			}
-			
 			if ( isEscaped ) {
-				writeJSONEscapedStringToStream(os, writtenValue);
+				writeJSONEscapedStringToStream(os, systemProperties.get(cleanParamName).trim());
 			} else {
-				os.write(systemProperties.get(varName).getBytes(Charset.forName("UTF-8")));
+				os.write(systemProperties.get(cleanParamName).getBytes(Charset.forName("UTF-8")));
 			}
 			canHandle = true;
 		}
@@ -98,7 +88,7 @@ public class MavenEnvInjectController implements ParamProcessor {
 	
 	protected void writeJSONEscapedStringToStream(OutputStream os,
 			String toWrite) throws IOException {
-		String tmpString = JSONObject.escape(toWrite);
+		String tmpString = JSONObject.escape(toWrite.trim());
 		os.write(tmpString.getBytes(Charset.forName("UTF-8")));
 	}
 	
