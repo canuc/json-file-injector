@@ -13,6 +13,7 @@ import javax.naming.NameNotFoundException;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.Base64;
 import org.json.simple.JSONObject;
 
 import com.kik.inject.iface.ParamProcessor;
@@ -75,8 +76,17 @@ public class MavenEnvInjectController implements ParamProcessor {
 		}
 		
 		if ( systemProperties.containsKey(cleanParamName)) {
+			
+			String value = systemProperties.get(varName);
+			final byte[] writtenValue;
+			if ( isBase64 ) {
+				writtenValue = Base64.encodeBase64(value.getBytes(Charset.forName("UTF-8")));
+			} else {
+				writtenValue = value.getBytes(Charset.forName("UTF-8"));
+			}
+			
 			if ( isEscaped ) {
-				writeJSONEscapedStringToStream(os, systemProperties.get(varName));
+				writeJSONEscapedStringToStream(os, writtenValue);
 			} else {
 				os.write(systemProperties.get(varName).getBytes(Charset.forName("UTF-8")));
 			}
