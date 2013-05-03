@@ -125,7 +125,7 @@ public class FileInjectController implements ParamProcessor {
 		} else {
 			cleanParamName = varName;
 		}
-		
+		StringBuffer buffer = new StringBuffer();
 		if ( mapConfig.containsKey(cleanParamName)) {
 			File fileForVar = mapConfig.get(cleanParamName);
 			InputStream is = null;
@@ -133,7 +133,7 @@ public class FileInjectController implements ParamProcessor {
 				is = new FileInputStream(fileForVar);
 				InputStream wrappedInputStream = null;
 				if (  isBase64) {
-					wrappedInputStream = new Base64InputStream(is,true);
+					wrappedInputStream = new Base64InputStream(is,true,-1,new byte[0]);
 				} else {
 					wrappedInputStream = new BufferedInputStream(is);
 				}
@@ -147,12 +147,13 @@ public class FileInjectController implements ParamProcessor {
 						done = true;
 						break;
 					}
-					String tmpString = new String(ret, 0, read);
-					if ( isEscaped ) {
-						writeJSONEscapedStringToStream(os, tmpString);
-					} else {
-						os.write(tmpString.getBytes(Charset.forName("UTF-8")));
-					}
+					buffer.append(new String(ret, 0, read));	
+				}
+				
+				if ( isEscaped ) {
+					writeJSONEscapedStringToStream(os, buffer.toString());
+				} else {
+					os.write(buffer.toString().getBytes(Charset.forName("UTF-8")));
 				}
 
 				wrappedInputStream.close();
