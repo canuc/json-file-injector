@@ -43,9 +43,9 @@ public class InjectJSONVars extends AbstractMojo {
 	 * Location of the parameters to specify. These are files with static
 	 * information to fill into any vars.
 	 * 
-	 * @parameter default-value="${basedir}/src/inject/"
+	 * @parameter default-value="${project.basedir}/src/inject/"
 	 */
-	@Parameter(defaultValue = "${basedir}/src/inject/")
+	@Parameter(defaultValue = "${project.basedir}/src/inject/")
 	private String dirVarFiles;
 
 	/**
